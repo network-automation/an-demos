@@ -1,0 +1,11 @@
+---
+- name: Configure the webservers
+  hosts: app_hosts
+  become: yes
+  roles:
+    - apache
+  # pre_tasks:
+  #   - name: Update all packages
+  #     yum:
+  #       name: '*'
+  #       state: latest

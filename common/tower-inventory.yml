@@ -1,0 +1,39 @@
+- hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: Add tower inventory
+      tower_inventory:
+        name: "an-demo-kit"
+        organization: "Default"
+        state: present
+        tower_config_file: "{{ inventory_dir }}/tower_cli.cfg"
+      delegate_to: localhost
+      run_once: yes
+
+    - debug: var=hostvars[inventory_hostname]
+
+    - name: Add tower group
+      tower_group:
+        name: "{{ item.key }}"
+        inventory: "an-demo-kit"
+        state: present
+        tower_config_file: "{{ inventory_dir }}/tower_cli.cfg"
+      with_dict: "{{ groups }}"
+      when: item.key != 'all'
+      delegate_to: localhost
+      run_once: yes
+
+    - name: Add tower host
+      tower_host:
+        name: "{{ inventory_hostname }}"
+        inventory: "an-demo-kit"
+        state: present
+        tower_config_file: "{{ inventory_dir }}/tower_cli.cfg"
+        variables:
+          ansible_host: "{{ ansible_host }}"
+          ansible_user: "{{ ansible_user }}"
+          group_names: "{{ group_names }}"
+          ansible_network_os: "{{ ansible_network_os | default(omit) }}"
+          interfaces: "{{ interfaces | default(omit) }}"
+      delegate_to: localhost

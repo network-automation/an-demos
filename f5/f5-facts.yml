@@ -1,0 +1,17 @@
+---
+- name: Show F5 facts
+  hosts: tmos
+  connection: local
+  gather_facts: False
+  tasks:
+
+    - name: Get BIG-IP facts
+      bigip_facts:
+        server: "{{ ansible_host }}"
+        user: "{{ network_username }}"
+        password: "{{ network_password }}"
+        validate_certs: no
+        include: "system_info,software,self_ip"
+      register: bigip_facts
+
+    - debug: var=bigip_facts

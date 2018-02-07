@@ -1,0 +1,10 @@
+---
+- hosts: network
+  connection: network_cli
+  gather_facts: no
+
+  tasks:
+    - name: Add users
+      net_user:
+        aggregate: "{{ user_list }}"
+      when: user_list is defined

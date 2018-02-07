@@ -1,0 +1,7 @@
+---
+- name: Get facts
+  ios_facts:
+    gather_subset: all
+  register: ios_facts
+
+- debug: var=ios_facts

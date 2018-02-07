@@ -1,0 +1,15 @@
+---
+- hosts: network
+  gather_facts: no
+  connection: local
+  vars:
+    dns_servers:
+      - 8.8.8.8
+      - 8.8.4.4
+  tasks:
+    - name: configure ios system properties
+      ios_system:
+        domain_name: ansible.com
+        name_servers: "{{ dns_servers }}"
+        lookup_enabled: yes
+      when: ansible_network_os == 'ios'

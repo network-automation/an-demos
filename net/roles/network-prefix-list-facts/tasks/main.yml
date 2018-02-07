@@ -1,0 +1,7 @@
+---
+- set_fact:
+    found_prefix_list_name: ''
+    found_prefix_list_cidr: ''
+    found_prefix_list_seq: ''
+
+- include_tasks: "{{ ansible_network_os }}-prefix-list-facts.yml"

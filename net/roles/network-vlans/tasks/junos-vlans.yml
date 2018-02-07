@@ -1,0 +1,6 @@
+---
+- name: Update VLANs
+  junos_vlan:
+    aggregate: "{{ aggregate_vlan_list }}"
+  when: aggregate_vlan_list is defined
+  connection: netconf

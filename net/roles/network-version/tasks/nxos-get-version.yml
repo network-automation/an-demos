@@ -1,0 +1,9 @@
+---
+- name: Gather facts
+  nxos_command:
+    commands:
+      - show version | grep 'NXOS{{ ':' }} version'
+  register: results
+
+- set_fact:
+    net_version_system: "{{ results.stdout[0] | regex_replace('NXOS: version (\\S+)$', '\\1') }}"

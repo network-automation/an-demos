@@ -1,0 +1,46 @@
+- hosts: spokes
+  connection: network_cli
+  gather_facts: no
+  tasks:
+    - debug: msg="site_number {{ site_number }}"
+    - debug: msg="tunnel_network {{ tunnel_network }}"
+    - debug: msg="tunnel ip {{ tunnel_ip }}"
+
+    - name: Create tunnel {{ site_number }} on the Spoke
+      ios_config:
+        lines:
+          - "ip address {{ tunnel_ip | ipaddr('address') }} {{ tunnel_ip | ipaddr('netmask') }}"
+          - "tunnel source {{ interfaces.1.ip | ipaddr('address') }}"
+          - "tunnel destination {{ hostvars['rtr1.dc1'].ansible_host }}"
+          - ip mtu 1476
+          - ip tcp adjust-mss 1360
+        parents: "interface tunnel {{ site_number }}"
+
+    - name: Setup BGP on the Spoke
+      ios_config:
+        lines:
+          - "neighbor {{ hostvars['rtr1.dc1'].ansible_host }} remote-as 65000"
+          - "network {{ interfaces.2.ip | ipaddr('network') }}"
+        parents: "router bgp {{ tunnel_asn + site_number }}"
+
+- hosts: hubs
+  connection: network_cli
+  gather_facts: no
+  tasks:
+    - name: Create tunnel on Hub
+      ios_config:
+        lines:
+          - "ip address {{ hostvars[item].tunnel_network | ipaddr(1) | ipaddr('address') }} {{ hostvars[item].tunnel_network | ipaddr(1) | ipaddr('netmask') }}"
+          - "tunnel source {{ ansible_host }}"
+          - "tunnel destination {{ hostvars[item].interfaces.1.public_ip_address }}"
+          - ip mtu 1476
+          - ip tcp adjust-mss 1360
+        parents: "interface tunnel {{ hostvars[item].site_number }}"
+      with_items: "{{ groups.spokes | default([]) }}"
+
+    - name: Setup BGP on the Hub
+      ios_config:
+        lines:
+          - "neighbor {{ hostvars[item].tunnel_ip | ipaddr('address') }} remote-as {{ tunnel_asn + hostvars[item].site_number }}"
+        parents: "router bgp {{ tunnel_asn }}"
+      with_items: "{{ groups.spokes | default([]) }}"

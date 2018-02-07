@@ -1,0 +1,30 @@
+---
+- hosts: routers
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - name: Create the VRFs
+      ios_config:
+        lines:
+          - "rd {{ ansible_host }}:0"
+          - "address-family ipv4"
+        parents: "vrf definition {{ item }}"
+      with_items: "{{ vrf_list | default([]) }}"
+
+    - name: Add interfaces to the VRF
+      ios_config:
+        lines:
+          - "vrf forwarding {{ item.value.vrf }}"
+        parents: "interface {{ item.key }}"
+        defaults: yes
+      when: item.value.vrf is defined
+      with_dict: "{{ interfaces }}"
+
+    - name: Configure the interfaces
+      ios_config:
+        lines:
+          - "ip address {{ item.value.private_ip_address }} 255.255.255.0"
+        parents: "interface {{ item.key }}"
+      when: item.value.private_ip_address | ipaddr
+      with_dict: "{{ interfaces }}"

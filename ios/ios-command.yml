@@ -1,0 +1,15 @@
+---
+- hosts: network
+  gather_facts: no
+  connection: local
+  tasks:
+    - name: show version
+      ios_command:
+        commands:
+          - show int summary
+          - show int counter errors
+          - show int description
+          - show ip bgp summary
+      register: results
+
+    - debug: var=results

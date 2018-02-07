@@ -1,0 +1,7 @@
+---
+- name: diff the running-config against a provided config
+  ios_config:
+    diff_against: intended
+    defaults: no
+    intended_config: "{{ lookup('file', net_backup_file) }}"
+  register: diff_results

@@ -1,0 +1,18 @@
+---
+- hosts: network
+  connection: local
+  gather_facts: no
+  vars:
+    prefix_list: 199.66.188.0/26
+
+  tasks:
+    - include_role:
+        name: network-prefix-list-facts
+      vars:
+        find_prefix_cidr: "{{ prefix_list }}"
+
+    - debug: msg="Prefix list {{ prefix_list }} found in {{ found_prefix_list_name }}, seq {{ found_prefix_list_seq }}"
+      when: found_prefix_list_name != ''
+
+    - debug: msg="Prefix list {{ prefix_list }} not found"
+      when: found_prefix_list_name == ''

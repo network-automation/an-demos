@@ -1,0 +1,23 @@
+---
+- name: Enable the interfaces
+  junos_interface:
+    name: "{{ item.name }}"
+    enabled: True
+  when: item.private_ip_address | ipaddr
+  with_items: "{{ interfaces }}"
+  connection: netconf
+
+- name: Add interfaces to the VRF
+  junos_vrf:
+    name: "{{ item.name }}"
+    interfaces: "{{ item.interfaces }}"
+  with_items: "{{ vrf_list | default([]) }}"
+  connection: netconf
+
+- name: Set Interface IP
+  junos_l3_interface:
+    name: "{{ item.name }}"
+    ipv4: "{{ item.private_ip_address }}/24"
+  when: item.private_ip_address | ipaddr
+  with_items: "{{ interfaces }}"
+  connection: netconf

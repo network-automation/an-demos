@@ -1,0 +1,14 @@
+---
+- name: configure hostname and domain name
+  ios_system:
+    hostname: "{{ system_hostname }}"
+    # domain_name: "{{ domain_search | default(omit) }}"
+    domain_search: "{{ domain_search | default(omit) }}"
+    lookup_source: "{{ lookup_source | default(omit) }}"
+    name_servers: "{{ name_servers | default(omit) }}"
+- name: configure the login banner
+  ios_banner:
+    banner: login
+    text: "{{ network_banner }}"
+    state: present
+  when: network_banner is defined

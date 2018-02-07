@@ -1,0 +1,35 @@
+---
+- name: Create the source end of tunnel
+  ios_config:
+    provider:
+      username: ec2-user
+      host: "{{ hostvars[item.src_host].ansible_host }}"
+      ssh_keyfile: "./{{ cloud_name }}_key"
+      authorize: yes
+    parents: "interface Tunnel{{ network_tunnel_item.index }}"
+    lines:
+      - "ip address {{ item.src_ip_addr }}"
+      - "tunnel source {{ hostvars[item.src_host].interfaces[0].private_ip_address }}"
+      - "tunnel destination {{ hostvars[item.dst_host].ansible_host }}"
+      # - "tunnel key {{ item.key }}"
+      # - tunnel path-mtu-discovery
+      # - tunnel ttl 255
+      - mtu 1476
+
+- name: Create the destination end of tunnel
+  ios_config:
+    provider:
+      username: ec2-user
+      host: "{{ hostvars[item.dst_host].ansible_host }}"
+      ssh_keyfile: "./{{ cloud_name }}_key"
+      authorize: yes
+    parents: "interface Tunnel{{ item.index }}"
+    lines:
+      - "ip address {{ item.dst_ip_addr }}"
+      - "tunnel source {{ hostvars[item.dst_host].interfaces[0].private_ip_address }}"
+      - "tunnel destination {{ hostvars[item.src_host].interfaces[0].public_ip_address }}"
+      - "tunnel key {{ item.key }}"
+      - tunnel path-mtu-discovery
+      - tunnel ttl 255
+      - mtu 1476
+  with_items: "{{ tunnels }}"

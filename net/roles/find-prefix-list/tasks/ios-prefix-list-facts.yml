@@ -1,0 +1,16 @@
+---
+- set_fact:
+    found_prefix_list: ''
+
+- name: Get the prefix list information
+  ios_command:
+    commands:
+      - show run | inc ip prefix-list
+  register: prefix_list_results
+
+# - debug: var=prefix_list_results
+
+- include_tasks: "ios-prefix-list-item.yml"
+  with_items: "{{ prefix_list_results.stdout_lines }}"
+  loop_control:
+    loop_var: prefix_list_item

@@ -1,0 +1,8 @@
+---
+- hosts: routers
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - include_role:
+        name: network-tunnels

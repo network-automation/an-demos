@@ -1,0 +1,4 @@
+- hosts: localhost,all
+  tasks:
+    - debug: var=hostvars[inventory_hostname]
+    - debug: var=inventory_dir

@@ -1,0 +1,9 @@
+---
+- name: Gather facts
+  ios_facts:
+    gather_subset:
+      - hardware
+  register: command_output
+
+- set_fact:
+    net_version_system: "{{ ansible_net_version }}"

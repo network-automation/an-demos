@@ -1,0 +1,22 @@
+---
+- name: Configure the interfaces
+  ios_config:
+    lines:
+      - "ip address {{ item.ip | ipaddr('address') }} {{ item.ip | ipaddr('netmask') }}"
+      - no shut
+    parents: "interface {{ item.name }}"
+  when: item.ip | ipaddr
+  with_items: "{{ interfaces | default([]) }}"
+
+# - name: Add interfaces to the VRF
+#   ios_vrf:
+#     name: "{{ item.name }}"
+#     interfaces: "{{ item.interfaces }}"
+#   with_items: "{{ vrf_list | default([]) }}"
+#
+# - name: Set Interface IP
+#   ios_l3_interface:
+#     name: "{{ item.name }}"
+#     ipv4: "{{ item.private_ip_cidr }}"
+#   when: item.private_ip_cidr | ipaddr
+#   with_items: "{{ interfaces | default([]) }}"
