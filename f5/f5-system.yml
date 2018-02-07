@@ -7,10 +7,9 @@
   vars:
     network_username: admin
     network_password: netsuperadmin
-    cloud_cidr: 10.1.0.0/16
     interfaces:
-      - ip: "{{ cloud_cidr | ipsubnet(24, 1) | ipaddr(-2) | ipaddr('address') }}"
-      - ip: "{{ cloud_cidr | ipsubnet(24, 2) | ipaddr(-2) | ipaddr('address') }}"
+      - ip: 10.1.1.254/24
+      - ip: 10.1.2.254/24
 
   tasks:
 
