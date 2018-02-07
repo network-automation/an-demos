@@ -28,18 +28,18 @@
         validate_certs: no
         name: "{{ pool_name }}"
 
-    - name: Create node {{ node_name }}
-      bigip_node:
-        server: "{{ ansible_host }}"
-        user: "{{ network_username }}"
-        password: "{{ network_password }}"
-        validate_certs: no
-        state: "present"
-        partition: "{{ pool_partition }}"
-        host: "{{ node_host }}"
-        name: "{{ node_name }}"
+#    - name: Create node {{ node_name }}
+#      bigip_node:
+#        server: "{{ ansible_host }}"
+#        user: "{{ network_username }}"
+#        password: "{{ network_password }}"
+#        validate_certs: no
+#        state: "present"
+#        partition: "{{ pool_partition }}"
+#        host: "{{ node_host }}"
+#        name: "{{ node_name }}"
 
-    - name: Add node to pool
+    - name: Ensure node is member of pool
       bigip_pool_member:
         server: "{{ ansible_host }}"
         user: "{{ network_username }}"
