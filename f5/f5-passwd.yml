@@ -5,7 +5,8 @@
   gather_facts: False
 
   vars:
-    network_password: supersecret
+    network_username: admin
+    network_password: netsuperadmin
 
   tasks:
     - name: wait for SSH prompt (timeout 10min)
