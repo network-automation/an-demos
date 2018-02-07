@@ -3,45 +3,16 @@
   hosts: tmos
   connection: local
   gather_facts: False
+
+  vars:
+    network_username: admin
+    network_password: netsuperadmin
+    interfaces:
+      - ip: 10.1.1.1/24
+      - ip: 10.1.2.1/24
+
   tasks:
 
-    # - name: wait for SSH prompt (timeout 10min)
-    #   wait_for:
-    #     port: 22
-    #     host: "{{ ansible_host }}"
-    #     timeout: 600
-
-    # - name: Set the hostname of the BIG-IP
-    #   bigip_hostname:
-    #     server: "{{ ansible_host }}"
-    #     user: "{{ network_username }}"
-    #     password: "{{ network_password }}"
-    #     hostname: "{{ interfaces[0].public_dns_name }}"
-    #   validate_certs: "no"
-
-    # - name: Set the DNS settings on the BIG-IP
-    #   bigip_device_dns:
-    #     server: "{{ ansible_host }}"
-    #     user: "{{ network_username }}"
-    #     password: "{{ network_password }}"
-    #     name_servers:
-    #       - 8.8.8.8
-    #       - 8.8.4.4
-    #     search:
-    #       - localdomain
-    #       - lab.local
-    #   state: present
-    #   validate_certs: "no"
-    #
-    # - name: Set NTP server
-    #   bigip_device_ntp:
-    #     server: "{{ ansible_host }}"
-    #     user: "{{ network_username }}"
-    #     password: "{{ network_password }}"
-    #     ntp_servers:
-    #         - 169.254.169.123
-    #     validate_certs: "no"
-    #
     - name: Set timezone
       bigip_device_ntp:
         server: "{{ ansible_host }}"
@@ -61,9 +32,9 @@
 
     - name: Address Outside Interface
       bigip_selfip:
-          address: "{{ interfaces[1].ip | ipaddr('address') }}"
+          address: "{{ interfaces[0].ip | ipaddr('address') }}"
           name: "outside"
-          netmask: "{{ interfaces[1].ip | ipaddr('netmask') }}"
+          netmask: "{{ interfaces[0].ip | ipaddr('netmask') }}"
           server: "{{ ansible_host }}"
           user: "{{ network_username }}"
           password: "{{ network_password }}"
@@ -81,9 +52,9 @@
 
     - name: Address Inside Interface
       bigip_selfip:
-          address: "{{ interfaces[2].ip | ipaddr('address') }}"
+          address: "{{ interfaces[1].ip | ipaddr('address') }}"
           name: "inside"
-          netmask: "{{ interfaces[2].ip | ipaddr('netmask') }}"
+          netmask: "{{ interfaces[1].ip | ipaddr('netmask') }}"
           server: "{{ ansible_host }}"
           user: "{{ network_username }}"
           password: "{{ network_password }}"
