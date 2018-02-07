@@ -1,0 +1,11 @@
+---
+- hosts: network
+  connection: network_cli
+  gather_facts: no
+
+  tasks:
+    - include_role:
+        name: network_hostname
+      vars:
+        - network_hostname: "{{ inventory_hostname }}"
+        - network_domain_name: "{{ site_domain_name }}"

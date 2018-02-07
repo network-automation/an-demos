@@ -1,0 +1,4 @@
+---
+- net_system:
+    hostname: "{{ network_hostname }}"
+    domain_name: "{{ network_domain_name | default(omit) }}"

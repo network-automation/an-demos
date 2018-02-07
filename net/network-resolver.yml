@@ -1,0 +1,12 @@
+---
+- hosts: network
+  connection: network_cli
+  gather_facts: no
+
+  tasks:
+    - include_role:
+        name: network_resolver
+      vars:
+        - network_domain_search: "{{ site_domain_search | default(omit) }}"
+        - network_lookup_enabled: "{{ site_lookup_enabled | default(omit) }}"
+        - network_servers: "{{ site_name_servers | default(omit) }}"
