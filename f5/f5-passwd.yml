@@ -4,10 +4,6 @@
   connection: local
   gather_facts: False
 
-  vars:
-    network_username: admin
-    network_password: netsuperadmin
-
   tasks:
     - name: wait for SSH prompt (timeout 10min)
       wait_for:
@@ -20,4 +16,4 @@
       expect:
         command: ssh -o StrictHostKeyChecking=no admin@"{{ ansible_host }}" modify auth password admin ; save sys config
         responses:
-          (?i)password: "{{ network_password }}"
+          (?i)password: "{{ network_password | default( lookup('env', 'F5_PASSWORD') ) }}"

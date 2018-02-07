@@ -5,9 +5,6 @@
   gather_facts: False
 
   vars:
-    network_username: admin
-    network_password: netsuperadmin
-
     pool_name: http-pool
     pool_partition: Common
 
@@ -22,16 +19,16 @@
     - name: Ensure pool exists
       bigip_pool:
         server: "{{ ansible_host }}"
-        user: "{{ network_username }}"
-        password: "{{ network_password }}"
+        user: "{{ network_username | default(omit) }}"
+        password: "{{ network_password | default(omit) }}"
         validate_certs: no
         name: "{{ pool_name }}"
 
     - name: Ensure node exists and is member of pool
       bigip_pool_member:
         server: "{{ ansible_host }}"
-        user: "{{ network_username }}"
-        password: "{{ network_password }}"
+        user: "{{ network_username | default(omit) }}"
+        password: "{{ network_password | default(omit) }}"
         validate_certs: no
         pool: "{{ pool_name }}"
         host: "{{ node_host }}"
@@ -40,8 +37,8 @@
     - name: Ensure VirtualServer for pool
       bigip_virtual_server:
         server: "{{ ansible_host }}"
-        user: "{{ network_username }}"
-        password: "{{ network_password }}"
+        user: "{{ network_username | default(omit) }}"
+        password: "{{ network_password | default(omit) }}"
         name: "{{ vserver_name }}"
         destination: "{{ vserver_destination }}"
         port: "{{ vserver_port }}"

@@ -5,8 +5,6 @@
   gather_facts: False
 
   vars:
-    network_username: admin
-    network_password: netsuperadmin
     interfaces:
       - { name: outside, interface: 1.1, ip: 10.1.1.254/24 }
       - { name: inside, interface: 1.2, ip: 10.1.2.254/24 }
@@ -16,16 +14,16 @@
     - name: Set timezone
       bigip_device_ntp:
         server: "{{ ansible_host }}"
-        user: "{{ network_username }}"
-        password: "{{ network_password }}"
+        user: "{{ network_username | default(omit) }}"
+        password: "{{ network_password | default(omit) }}"
         timezone: "America/New_York"
         validate_certs: "no"
 
-    - name: Ensure state of VLAN interface
+    - name: Ensure state of VLAN interfaces
       bigip_vlan:
         server: "{{ ansible_host }}"
-        user: "{{ network_username }}"
-        password: "{{ network_password }}"
+        user: "{{ network_username | default(omit) }}"
+        password: "{{ network_password | default(omit) }}"
         name: "{{ bigip_vlan.name }}"
         untagged_interfaces: "{{ bigip_vlan.interface }}"
         validate_certs: "no"
@@ -33,16 +31,16 @@
       loop_control:
         loop_var: bigip_vlan
 
-    - name: Ensure selfip address on interface
+    - name: Ensure selfip address on interfaces
       bigip_selfip:
-          address: "{{ bigip_selfip.ip | ipaddr('address') }}"
-          name: "outside"
-          netmask: "{{ bigip_selfip.ip | ipaddr('netmask') }}"
-          server: "{{ ansible_host }}"
-          user: "{{ network_username }}"
-          password: "{{ network_password }}"
-          validate_certs: "no"
-          vlan: "{{ bigip_selfip.name }}"
+        server: "{{ ansible_host }}"
+        user: "{{ network_username | default(omit) }}"
+        password: "{{ network_password | default(omit) }}"
+        address: "{{ bigip_selfip.ip | ipaddr('address') }}"
+        name: "outside"
+        netmask: "{{ bigip_selfip.ip | ipaddr('netmask') }}"
+        validate_certs: "no"
+        vlan: "{{ bigip_selfip.name }}"
       with_items: "{{ interfaces | default([]) }}"
       loop_control:
         loop_var: bigip_selfip
