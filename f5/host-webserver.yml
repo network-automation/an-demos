@@ -1,0 +1,11 @@
+---
+- name: Configure the F5s hosts
+  hosts: f5:&hosts
+  connection: local
+  gather_facts: False
+
+  tasks:
+    - name: Install webserver
+      yum:
+        name: httpd
+        state: present

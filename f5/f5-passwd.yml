@@ -1,6 +1,6 @@
 ---
 - name: Configure the F5s
-  hosts: tmos
+  hosts: f5:&tmos
   connection: local
   gather_facts: False
 
