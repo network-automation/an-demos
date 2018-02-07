@@ -3,14 +3,24 @@
   hosts: tmos
   connection: local
   gather_facts: False
+
   vars:
+    network_username: admin
+    network_password: netsuperadmin
+
     pool_name: http-pool
     pool_partition: Common
-    vs_name: "{{ pool_name }}"
-    vs_port: 80
+
+    node_name: host1
+    node_host: 10.1.2.10
+    node_port: 80
+
+    vserver_name: "{{ pool_name }}"
+    vserver_destination: 10.1.1.254
+    vserver_port: 80
 
   tasks:
-    - name: Create the pool {{ pool_name }}
+    - name: Create pool {{ pool_name }}
       bigip_pool:
         server: "{{ ansible_host }}"
         user: "{{ network_username }}"
@@ -18,7 +28,7 @@
         validate_certs: no
         name: "{{ pool_name }}"
 
-    - name: Add a new node
+    - name: Create node {{ node_name }}
       bigip_node:
         server: "{{ ansible_host }}"
         user: "{{ network_username }}"
@@ -26,12 +36,10 @@
         validate_certs: no
         state: "present"
         partition: "{{ pool_partition }}"
-        host: "{{ hostvars[item].ansible_host }}"
-        name: "{{ hostvars[item].ansible_host }}"
-      when: groups.app_hosts is defined
-      with_items: "{{ groups.app_hosts }}"
+        host: "{{ node_host }}"
+        name: "{{ node_name }}"
 
-    - name: Add host to pool member
+    - name: Add node to pool
       bigip_pool_member:
         server: "{{ ansible_host }}"
         user: "{{ network_username }}"
@@ -39,25 +47,21 @@
         validate_certs: no
         pool: "{{ pool_name }}"
         partition: "{{ pool_partition }}"
-        host: "{{ hostvars[item].ansible_host }}"
-        port: 80
+        host: "{{ node_host }}"
+        port: "{{ node_port }}"
         description: "web server"
         connection_limit: 100
         rate_limit: 50
         ratio: 2
-      when: groups.app_hosts is defined
-      with_items: "{{ groups.app_hosts }}"
 
-    - name: Add VS on BIG-IP
+    - name: Create VirtualServer {{ vserver_destination }}
       bigip_virtual_server:
         server: "{{ ansible_host }}"
         user: "{{ network_username }}"
         password: "{{ network_password }}"
-        name: "{{ vs_name }}"
-        destination: "{{ interfaces[1].private_ip_address }}"
-        port: "{{ vs_port }}"
+        name: "{{ vserver_name }}"
+        destination: "{{ vserver_destination }}"
+        port: "{{ vserver_port }}"
         pool: "{{ pool_name }}"
         snat: Automap
         validate_certs: False
-
-    - debug: msg="The Virtual Server Address is {{ interfaces[1].public_ip_address }}"
