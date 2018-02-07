@@ -8,8 +8,8 @@
     network_username: admin
     network_password: netsuperadmin
     interfaces:
-      - ip: 10.1.1.254/24
-      - ip: 10.1.2.254/24
+      - { name: outside, interface: 1.1, ip: 10.1.1.254/24 }
+      - { name: inside, interface: 1.2, ip: 10.1.2.254/24 }
 
   tasks:
 
@@ -21,42 +21,28 @@
         timezone: "America/New_York"
         validate_certs: "no"
 
-    - name: Create Outside VLAN
+    - name: Ensure state of VLAN interface
       bigip_vlan:
         server: "{{ ansible_host }}"
         user: "{{ network_username }}"
         password: "{{ network_password }}"
-        name: "outside"
-        untagged_interfaces: 1.1
+        name: "{{ bigip_vlan.name }}"
+        untagged_interfaces: "{{ bigip_vlan.interface }}"
         validate_certs: "no"
+      with_items: "{{ interfaces | default([]) }}"
+      loop_control:
+        loop_var: bigip_vlan
 
-    - name: Address Outside Interface
+    - name: Ensure selfip address on interface
       bigip_selfip:
-          address: "{{ interfaces[0].ip | ipaddr('address') }}"
+          address: "{{ bigip_selfip.ip | ipaddr('address') }}"
           name: "outside"
-          netmask: "{{ interfaces[0].ip | ipaddr('netmask') }}"
+          netmask: "{{ bigip_selfip.ip | ipaddr('netmask') }}"
           server: "{{ ansible_host }}"
           user: "{{ network_username }}"
           password: "{{ network_password }}"
           validate_certs: "no"
-          vlan: "outside"
-
-    - name: Create Inside VLAN
-      bigip_vlan:
-        server: "{{ ansible_host }}"
-        user: "{{ network_username }}"
-        password: "{{ network_password }}"
-        name: "inside"
-        untagged_interfaces: 1.2
-        validate_certs: "no"
-
-    - name: Address Inside Interface
-      bigip_selfip:
-          address: "{{ interfaces[1].ip | ipaddr('address') }}"
-          name: "inside"
-          netmask: "{{ interfaces[1].ip | ipaddr('netmask') }}"
-          server: "{{ ansible_host }}"
-          user: "{{ network_username }}"
-          password: "{{ network_password }}"
-          validate_certs: "no"
-          vlan: "inside"
+          vlan: "{{ bigip_selfip.name }}"
+      with_items: "{{ interfaces | default([]) }}"
+      loop_control:
+        loop_var: bigip_selfip
