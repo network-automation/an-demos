@@ -11,7 +11,6 @@
     pool_name: http-pool
     pool_partition: Common
 
-    node_name: host1
     node_host: 10.1.2.10
     node_port: 80
 
@@ -20,7 +19,7 @@
     vserver_port: 80
 
   tasks:
-    - name: Create pool {{ pool_name }}
+    - name: Ensure pool exists
       bigip_pool:
         server: "{{ ansible_host }}"
         user: "{{ network_username }}"
@@ -28,33 +27,17 @@
         validate_certs: no
         name: "{{ pool_name }}"
 
-#    - name: Create node {{ node_name }}
-#      bigip_node:
-#        server: "{{ ansible_host }}"
-#        user: "{{ network_username }}"
-#        password: "{{ network_password }}"
-#        validate_certs: no
-#        state: "present"
-#        partition: "{{ pool_partition }}"
-#        host: "{{ node_host }}"
-#        name: "{{ node_name }}"
-
-    - name: Ensure node is member of pool
+    - name: Ensure node exists and is member of pool
       bigip_pool_member:
         server: "{{ ansible_host }}"
         user: "{{ network_username }}"
         password: "{{ network_password }}"
         validate_certs: no
         pool: "{{ pool_name }}"
-        partition: "{{ pool_partition }}"
         host: "{{ node_host }}"
         port: "{{ node_port }}"
-        description: "web server"
-        connection_limit: 100
-        rate_limit: 50
-        ratio: 2
 
-    - name: Create VirtualServer {{ vserver_destination }}
+    - name: Ensure VirtualServer for pool
       bigip_virtual_server:
         server: "{{ ansible_host }}"
         user: "{{ network_username }}"
