@@ -1,5 +1,0 @@
----
-- set_fact:
-    aggregate_vlan_list: "{{ global_vlan_list | union(host_vlan_list|default([])) }}"
-
-- include_tasks: "{{ ansible_network_os }}-vlans.yml"

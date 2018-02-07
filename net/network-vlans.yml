@@ -1,5 +1,9 @@
 - hosts: switches
   gather_facts: no
   connection: network_cli
-  roles:
-    - network-vlans
+
+  tasks:
+    - include_role:
+        name: network_vlans
+      vars:
+        - network_vlan_list: "{{ site_vlans }}"
