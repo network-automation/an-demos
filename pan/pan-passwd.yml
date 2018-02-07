@@ -1,0 +1,31 @@
+---
+- name: Configure the PAN password
+  hosts: panos
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: wait for SSH prompt (timeout 10min)
+      wait_for:
+        port: 22
+        host: "{{ ansible_host }}"
+        timeout: 600
+
+    - name: Find a private key to use
+      set_fact:
+        ssh_private_key: "{{ item }}"
+      with_first_found:
+        - files:
+          - "{{ ansible_ssh_private_key_file }}"
+          - "../{{ ansible_ssh_private_key_file }}"
+          - '~/.ssh/id_rsa'
+          - '~/.ssh/id_dsa'
+
+    - name: set admin password
+      panos_admpwd:
+        ip_address: "{{ ansible_host }}"
+        key_filename: "{{ ssh_private_key }}"
+        newpassword: "{{ network_password }}"
+      register: result
+      until: not result | failed
+      retries: 10
+      delay: 30

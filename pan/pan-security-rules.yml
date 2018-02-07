@@ -1,0 +1,28 @@
+---
+- name: Configure PAN security rules
+  hosts: panos
+  connection: local
+  gather_facts: False
+
+  tasks:
+    - name: Create security rules
+      panos_security_rule:
+        ip_address: "{{ ansible_host }}"
+        password: "{{ network_password }}"
+        operation: "{{ item.operation | default (omit) }}"
+        rule_name: "{{ item.rule_name | default (omit) }}"
+        service: "{{ item.service | default (omit) }}"
+        description: "{{ item.description | default (omit) }}"
+        source_zone: "{{ item.source_zone | default (omit) }}"
+        destination_zone: "{{ item.destination_zone | default (omit) }}"
+        action: "{{ item.action | default ('allow') }}"
+        commit: "False"
+      with_items: "{{ panos_security_rules }}"
+      register: command_result
+      failed_when: "'MODULE FAILURE' in command_result.msg"
+      changed_when: "'successfully added' in command_result.msg"
+
+    - name: Commit the configure
+      panos_commit:
+        ip_address: "{{ ansible_host }}"
+        password: "{{ network_password }}"

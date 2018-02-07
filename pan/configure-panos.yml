@@ -1,0 +1,201 @@
+---
+- name: Read in the cloud inventory
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+    - include_role:
+        name: cloud-inventory
+      vars:
+        - cloud_vpc_name: "{{ vpc_item.name }}"
+        - cloud_vpc_data: "{{ vpc_item }}"
+      with_items: "{{ vpc_list | default([]) }}"
+      tasks_from: instances
+      loop_control:
+        loop_var: vpc_item
+      delegate_to: localhost
+      run_once: yes
+
+- name: Configure the PAN
+  hosts: panos
+  connection: local
+  gather_facts: False
+  vars:
+    admin_password: 'Cisc0123'
+    pan_outside_interface: 'ethernet1/1'
+    pan_inside_interface: 'ethernet1/2'
+    panos_objects:
+      - operation: 'add'
+        serviceobject: 'service-ssh'
+        destination_port: '22'
+        protocol: 'tcp'
+        description: 'ssh on 22'
+    panos_nat_rules:
+        rule_name: "NATAllOut"
+        source_zone: ["trust"]
+        destination_zone: "untrust"
+        source_ip: ["any"]
+        destination_ip: ["any"]
+        snat_type: "dynamic-ip-and-port"
+        snat_interface: "ethernet1/1"
+    panos_security_rules:
+      - operation: 'add'
+        rule_name: 'SSH traffic'
+        service: 'service-ssh'
+        description: 'Allow HTTP traffic'
+        source_zone: ['untrust']
+        destination_zone: ['trust']
+        action: 'allow'
+
+  # roles:
+  #   - role: PaloAltoNetworks.paloaltonetworks
+
+  tasks:
+
+    - debug: var=hostvars[inventory_hostname]
+    # - debug: var=ansible_host
+
+    - name: wait for SSH prompt (timeout 10min)
+      wait_for:
+        port: 22
+        host: "{{ ansible_host }}"
+        timeout: 600
+
+    - name: set admin password
+      panos_admpwd:
+        ip_address: "{{ ansible_host }}"
+        key_filename: "./smc_pan_demo_key"
+        newpassword: "{{ admin_password }}"
+      register: result
+      until: not result | failed
+      retries: 10
+      delay: 30
+
+    - name: configure {{ interfaces[1].name }} for DHCP
+      panos_interface:
+        ip_address: "{{ ansible_host }}"
+        password: "{{ admin_password }}"
+        if_name: "{{ interfaces[1].name }}"
+        zone_name: "untrust"
+        create_default_route: "yes"
+        commit: False
+
+    - name: configure {{ interfaces[2].name }} for DHCP
+      panos_interface:
+        ip_address: "{{ ansible_host }}"
+        password: "{{ admin_password }}"
+        if_name: "{{ interfaces[2].name }}"
+        zone_name: "trust"
+        create_default_route: "no"
+        commit: False
+    #
+    # - name: Create Objects
+    #   panos_object:
+    #     ip_address: "{{ pan_ip_address }}"
+    #     password: "{{ admin_password }}"
+    #     operation: "{{ item.operation }}"
+    #     serviceobject: "{{ item.serviceobject }}"
+    #     destination_port: "{{ item.destination_port }}"
+    #     protocol: "{{ item.protocol }}"
+    #     description: "{{ item.description }}"
+    #   with_items: "{{ panos_objects }}"
+    #   register: command_result
+    #   failed_when: "'MODULE FAILURE' in command_result.msg"
+    #   changed_when: "'already exists' in command_result.msg"
+    #
+    # - name: Create NAT rules
+    #   panos_nat_rule:
+    #     ip_address: "{{ pan_ip_address }}"
+    #     password: "{{ admin_password }}"
+    #     operation: "{{ item.operation }}"
+    #     rule_name: "{{ item.rule_name }}"
+    #     source_zone: "{{ item.source_zone }}"
+    #     destination_zone: "{{ item.destination_zone }}"
+    #     source_ip: "{{ item.source_ip }}"
+    #     destination_ip: "{{ item.destination_ip }}"
+    #     service: "{{ item.service | default(omit) }}"
+    #     snat_type: "{{ item.snat_type }}"
+    #     snat_interface: "{{ item.snat_interface }}"
+    #     dnat_address: "{{ item.dnat_address | default(omit) }}"
+    #     dnat_port: "{{ item.dnat_port | default(omit) }}"
+    #     commit: "False"
+    #   with_items: "{{ panos_nat_rules }}"
+    #   register: command_result
+    #   tags:
+    #     - nat
+    #   # failed_when: "'MODULE FAILURE' in command_result.msg"
+    #   # changed_when: "'already exists' in command_result.msg"
+    #
+    # - name: Create security rules
+    #   panos_security_rule:
+    #     ip_address: "{{ pan_ip_address }}"
+    #     password: "{{ admin_password }}"
+    #     operation: "{{ item.operation }}"
+    #     rule_name: "{{ item.rule_name }}"
+    #     service: "{{ item.service }}"
+    #     description: "{{ item.description }}"
+    #     source_zone: "{{ item.source_zone }}"
+    #     destination_zone: "{{ item.destination_zone }}"
+    #     action: "{{ item.action }}"
+    #     commit: "False"
+    #   with_items: "{{ panos_security_rules }}"
+    #   register: command_result
+    #   failed_when: "'MODULE FAILURE' in command_result.msg"
+    #   changed_when: "'already exists' in command_result.msg"
+    #
+    # - include_vars:
+    #     file: "{{ lookup('file', '{{ playbook_dir }}/inventory/smc-pan-demo/host_vars/smc_pan_demo_rtr/interfaces.yml' ) }}"
+    #     name: pan_interfaces
+
+
+
+
+    # - name: Commit the configure
+    #   panos_commit:
+    #     ip_address: "{{ pan_ip_address }}"
+    #     password: "{{ admin_password }}"
+
+# - name: Configure the SSH hosts
+#   hosts: tag_groups_ssh
+#   connection: local
+#   gather_facts: False
+#   vars:
+#     admin_password: 'Cisc0123'
+#     pan_outside_interface: 'ethernet1/1'
+#     host_outside_interface: 'eth0'
+#     pan_inside_interface: 'ethernet1/2'
+#
+#   tasks:
+#     - include_vars:
+#         file: "{{ lookup('file', '{{ playbook_dir }}/inventory/smc-pan-demo/host_vars/smc_pan_demo_rtr/interfaces.yml' ) }}"
+#         name: pan_interfaces
+#
+#     - debug: var=pan_interfaces
+#
+#     - set_fact:
+#         host_ip_address: "{{ hostvars[inventory_hostname].interfaces.eth0.private_ip_address}}"
+#         pan_ip_address: "{{ pan_interfaces.interfaces.ethernet1/1.private_ip_address}}"
+#
+#     - name: Create NAT rules
+#       panos_nat_rule:
+#         ip_address: "{{ pan_ip_address }}"
+#         password: "{{ admin_password }}"
+#         operation: 'add'
+#         rule_name: "NATSSH"
+#         source_zone: ["untrust"]
+#         destination_zone: "untrust"
+#         source_ip: ["any"]
+#         destination_ip: ["{{ pan_ip_address }}"]
+#         service: "service-ssh"
+#         snat_type: "dynamic-ip-and-port"
+#         snat_interface: "{{ pan_inside_interface }}"
+#         dnat_address: "{{ host_ip_address }}"
+#         dnat_port: "22"
+#       register: command_result
+#       failed_when: "'MODULE FAILURE' in command_result.msg"
+#       changed_when: "'already exists' in command_result.msg"
+#
+#     - name: Commit the configure
+#       panos_commit:
+#         ip_address: "{{ pan_ip_address }}"
+#         password: "{{ admin_password }}"

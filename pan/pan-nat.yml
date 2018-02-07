@@ -1,0 +1,31 @@
+---
+- name: Configure the PAN NAT Rules
+  hosts: panos
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Create NAT rules
+      panos_nat_rule:
+        ip_address: "{{ ansible_host }}"
+        password: "{{ network_password }}"
+        operation: add
+        rule_name: "{{ item.rule_name }}"
+        source_zone: "{{ item.source_zone }}"
+        destination_zone: "{{ item.destination_zone }}"
+        source_ip: "{{ item.source_ip | default (omit) }}"
+        destination_ip: "{{ item.destination_ip | default (omit) }}"
+        service: "{{ item.service | default(omit) }}"
+        snat_type: "{{ item.snat_type | default (omit) }}"
+        snat_interface: "{{ item.snat_interface | default (omit) }}"
+        dnat_address: "{{ item.dnat_address | default(omit) }}"
+        dnat_port: "{{ item.dnat_port | default(omit) }}"
+        commit: "False"
+      with_items: "{{ panos_nat_rules | default ({}) }}"
+      register: command_result
+      failed_when: "'MODULE FAILURE' in command_result.msg"
+      changed_when: "'successfully added' in command_result.msg"
+
+    - name: Commit the configure
+      panos_commit:
+        ip_address: "{{ ansible_host }}"
+        password: "{{ network_password }}"
