@@ -6,10 +6,7 @@
     - name: show version
       ios_command:
         commands:
-          - show int summary
-          - show int counter errors
-          - show int description
-          - show ip bgp summary
+          - show version
       register: results
 
     - debug: var=results

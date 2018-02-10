@@ -1,8 +1,7 @@
 ---
-- hosts: network
-  connection: network_cli
+- hosts: all
   gather_facts: no
 
   tasks:
     - include_role:
-        name: network-backup
+        name: network_backup

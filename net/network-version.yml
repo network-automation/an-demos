@@ -1,12 +1,12 @@
 ---
-- hosts: network
-  connection: local
+- hosts: all
+  connection: network_cli
   gather_facts: no
+  vars:
+    minimum_version_list:
+      ios: 16.06.01
+      junos: 17.2R1.13
 
   tasks:
     - include_role:
-        name: network-version
-      vars:
-        net_version_list:
-          ios: 16.06.01
-          nxos: 7.0(3)I2(2d)
+        name: network_version

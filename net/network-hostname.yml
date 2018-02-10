@@ -1,11 +1,10 @@
 ---
-- hosts: network
-  connection: network_cli
+- hosts: all
   gather_facts: no
+  vars:
+    site_domain_name: 'example.net'
 
   tasks:
-    - include_role:
-        name: network_hostname
-      vars:
-        - network_hostname: "{{ inventory_hostname }}"
-        - network_domain_name: "{{ site_domain_name }}"
+    - net_system:
+        hostname: "{{ inventory_hostname }}"
+        # domain_name: "{{ site_domain_name }}"
