@@ -1,8 +1,30 @@
 ---
-- hosts: routers
-  connection: local
+- name: Create the hub side of the tunnels
+  hosts: hub_routers
+  connection: network_cli
   gather_facts: no
-
   tasks:
     - include_role:
-        name: network-tunnels
+        name: network_tunnel
+      vars:
+        network_tunnel_ip: "{{ hostvars[item].tunnel_network | ipaddr(1) }}"
+        network_tunnel_num: "{{ hostvars[item].site_number }}"
+        network_tunnel_src: "{{ interfaces.0.name }}"
+        network_tunnel_dst: "{{ hostvars[item].interfaces.0.public_ip_address }}"
+      with_items: "{{ groups.spoke_routers | default([]) }}"
+
+- name: Create the spoke side of the tunnel
+  hosts: spoke_routers
+  connection: network_cli
+  gather_facts: no
+  tasks:
+    - set_fact:
+        tunnel_hub: "{{ groups.hub_routers[0] }}"
+
+    - include_role:
+        name: network_tunnel
+      vars:
+        network_tunnel_ip: "{{ tunnel_ip }}"
+        network_tunnel_num: "{{ site_number }}"
+        network_tunnel_src: "{{ interfaces.0.name }}"
+        network_tunnel_dst: "{{ hostvars[tunnel_hub].ansible_host }}"

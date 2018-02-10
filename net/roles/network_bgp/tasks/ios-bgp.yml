@@ -1,0 +1,10 @@
+---
+- name: Setup BGP Peer
+  ios_config:
+    lines:
+      - "bgp router-id {{ bgp_router_id }}"
+      - "neighbor {{ bgp_neighbor_ip }} remote-as {{ bgp_neighbor_asn }}"
+      - "network {{ bgp_local_network }}"
+      - address-family ipv4
+      - redistribute connected
+    parents: "router bgp {{ bgp_asn }}"

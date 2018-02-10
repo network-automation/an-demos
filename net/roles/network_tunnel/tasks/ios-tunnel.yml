@@ -1,0 +1,10 @@
+---
+- name: Create the GRE tunnel
+  ios_config:
+    parents: "interface Tunnel{{ network_tunnel_num }}"
+    lines:
+      - "ip address {{ network_tunnel_ip | ipaddr('address') }} {{ network_tunnel_ip | ipaddr('netmask') }}"
+      - "tunnel source {{ network_tunnel_src }}"
+      - "tunnel destination {{ network_tunnel_dst }}"
+      - ip tcp adjust-mss 1360
+      - ip mtu 1476
