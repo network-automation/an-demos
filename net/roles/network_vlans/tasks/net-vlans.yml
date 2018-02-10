@@ -1,4 +1,0 @@
----
-- name: Update VLANs
-  net_vlan:
-    aggregate: "{{ network_vlan_list | default([]) }}"

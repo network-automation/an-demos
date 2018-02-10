@@ -1,6 +1,0 @@
----
-- name: Update VLANs
-  junos_vlan:
-    aggregate: "{{ network_vlan_list | default([]) }}"
-  when: aggregate_vlan_list is defined
-  connection: netconf
