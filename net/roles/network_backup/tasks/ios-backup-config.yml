@@ -1,0 +1,10 @@
+---
+- name: Backup the config
+  ios_config:
+    backup: yes
+    save_when: always
+  register: config_output
+  changed_when: false
+
+- set_fact:
+    temp_backup_file: "{{ config_output.backup_path }}"

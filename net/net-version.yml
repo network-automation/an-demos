@@ -1,0 +1,12 @@
+---
+- hosts: all
+  gather_facts: no
+
+  tasks:
+    - ios_facts:
+      when: ansible_network_os == 'ios'
+
+    - junos_facts:
+      when: ansible_network_os == 'junos'
+
+    - debug: msg="{{ inventory_hostname }} is {{ ansible_network_os }} version {{ ansible_net_version }}"

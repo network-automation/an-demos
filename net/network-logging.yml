@@ -1,0 +1,11 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: configure host logging
+      net_logging:
+        dest: host
+        name: "{{ site_log_host }}"
+        facility: kernel
+        level: critical
+      when: site_log_host is defined
