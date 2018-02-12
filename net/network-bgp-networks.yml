@@ -1,0 +1,23 @@
+---
+- name: Add networks to the Hub
+  hosts: hub_routers
+  gather_facts: no
+  tasks:
+    - include_role:
+        name: network_bgp_networks
+      vars:
+        bgp_asn: "{{ tunnel_asn }}"
+        bgp_network_list:
+          - "{{ interfaces.2.ip }}"
+      with_items: "{{ groups.spoke_routers | default([]) }}"
+
+- name: Add networks to the Spoke
+  hosts: spoke_routers
+  gather_facts: no
+  tasks:
+    - include_role:
+        name: network_bgp_networks
+      vars:
+        bgp_asn: "{{ tunnel_asn + site_number|int }}"
+        bgp_network_list:
+          - "{{ interfaces.2.ip }}"

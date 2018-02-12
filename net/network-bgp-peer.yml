@@ -4,7 +4,7 @@
   gather_facts: no
   tasks:
     - include_role:
-        name: network_bgp
+        name: network_bgp_peer
       vars:
         bgp_router_id: "{{ tunnel_network | ipaddr(1) | ipaddr('address') }}"
         bgp_neighbor_ip: "{{ hostvars[item].tunnel_ip | ipaddr('address') }}"
@@ -18,7 +18,7 @@
   gather_facts: no
   tasks:
     - include_role:
-        name: network_bgp
+        name: network_bgp_peer
       vars:
         bgp_router_id: "{{ tunnel_ip | ipaddr('address') }}"
         bgp_neighbor_ip: "{{ tunnel_network | ipaddr(1) | ipaddr('address') }}"

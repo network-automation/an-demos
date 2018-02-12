@@ -1,7 +1,6 @@
 ---
 - name: Create the hub side of the tunnels
   hosts: hub_routers
-  connection: network_cli
   gather_facts: no
   tasks:
     - include_role:
@@ -15,7 +14,6 @@
 
 - name: Create the spoke side of the tunnel
   hosts: spoke_routers
-  connection: network_cli
   gather_facts: no
   tasks:
     - set_fact:

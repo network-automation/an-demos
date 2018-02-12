@@ -1,0 +1,8 @@
+---
+- name: Make sure that we can ping the hosts from the routers
+  hosts: routers
+  gather_facts: no
+  tasks:
+    - net_ping:
+        dest: "{{ hostvars[item].interfaces.0.private_ip_address }}"
+      with_items: "{{ groups.hosts | default([]) }}"
