@@ -37,7 +37,7 @@
         user: "{{ network_username | default(omit) }}"
         password: "{{ network_password | default(omit) }}"
         address: "{{ bigip_selfip.ip | ipaddr('address') }}"
-        name: "outside"
+        name:  "{{ bigip_selfip.name }}"
         netmask: "{{ bigip_selfip.ip | ipaddr('netmask') }}"
         validate_certs: "no"
         vlan: "{{ bigip_selfip.name }}"
