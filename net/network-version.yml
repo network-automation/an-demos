@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: network
   connection: network_cli
   gather_facts: no
   vars:

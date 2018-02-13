@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: network
   gather_facts: no
   tasks:
     - name: configure host logging
