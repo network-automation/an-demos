@@ -1,0 +1,35 @@
+---
+- hosts: network
+  gather_facts: no
+
+  tasks:
+    - include_role:
+        name: network_backup
+
+    - name: enable config archive
+      ios_config:
+        lines:
+          - path flash:archive_config
+          - maximum 14
+        #  - time-period 10
+        parents: archive
+
+    - name: list archives
+      ios_command:
+         commands:
+           - show archive | i Most Recent
+      register: archive
+
+    - debug:
+        msg: "{{archive}}"
+
+    # - name: grab archive config name
+    #   set_fact:
+    #     archive_config: "{{archive.stdout[0] | regex_replace('.*(flash:.*\\d)', '\\1')')}}"
+
+    # - name: grab archive config name
+    #   set_fact:
+    #     archive_config: "{{ archive.stdout_lines[0] | regex_search('flash:archive_config-\\w\\w\\w-\\d\\d-\\d\\d-\\d\\d-\\d\\d.\\d\\d\\d-\\d')}}"
+
+    - debug:
+        msg: "{{archive_config}}"

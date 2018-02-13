@@ -1,0 +1,33 @@
+---
+- hosts: network
+  gather_facts: no
+
+  tasks:
+    - name: grab archives
+      ios_command:
+         commands:
+           - show archive | i Most Recent
+      register: archive
+
+    - debug:
+        msg: "{{archive}}"
+
+    # - name: grab archive config name
+    #   set_fact:
+    #     archive_config: "{{archive.stdout[0] | regex_replace('.*(flash:.*\\d)', '\\1')')}}"
+
+    # - name: grab archive config name
+    #   set_fact:
+    #     archive_config: "{{ archive.stdout_lines[0] | regex_search('flash:archive_config-\\w\\w\\w-\\d\\d-\\d\\d-\\d\\d-\\d\\d.\\d\\d\\d-\\d')}}"
+
+    - debug:
+        msg: "{{archive_config}}"
+
+    - name: perform config replace
+      ios_command:
+        commands:
+          - config replace "{{archive_config}}" force
+      register: output
+
+    - debug:
+        msg: "{{output}}"
