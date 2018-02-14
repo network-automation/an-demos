@@ -3,9 +3,6 @@
   gather_facts: no
 
   tasks:
-    - include_role:
-        name: network_backup
-
     - name: enable config archive
       ios_config:
         lines:
