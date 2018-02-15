@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: network
   gather_facts: no
   vars:
     site_domain_name: 'example.net'

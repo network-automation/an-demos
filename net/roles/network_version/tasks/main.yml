@@ -5,4 +5,4 @@
 
 - debug: msg="{{ ansible_net_version }} < {{ minimum_version_list[ansible_network_os] }}"
   when: minimum_version_list[ansible_network_os] is defined
-  failed_when: ansible_net_version | version_compare(minimum_version_list[ansible_network_os], '<')
+  failed_when: ansible_net_version is version_compare(minimum_version_list[ansible_network_os], '<')
