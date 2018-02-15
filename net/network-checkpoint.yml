@@ -1,0 +1,7 @@
+---
+- hosts: network
+  gather_facts: no
+
+  tasks:
+    - include_role:
+        name: network_checkpoint
