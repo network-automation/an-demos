@@ -7,4 +7,4 @@
   tasks:
     - net_system:
         hostname: "{{ inventory_hostname }}"
-        # domain_name: "{{ site_domain_name }}"
+        domain_name: "{{ site_domain_name }}"

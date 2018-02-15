@@ -1,6 +1,5 @@
 ---
 - hosts: all
-  connection: network_cli
   gather_facts: no
   vars:
     network_name_servers:
@@ -8,7 +7,6 @@
       - 8.8.4.4
     network_domain_search:
       - example.net
-
 
   tasks:
     - name: Configure DNS resolver information
