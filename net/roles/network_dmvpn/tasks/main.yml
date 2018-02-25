@@ -1,0 +1,3 @@
+---
+# tasks file for network_dmvpn
+- include_tasks: "{{ ansible_network_os }}-dmvpn.yml"

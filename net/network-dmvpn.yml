@@ -1,0 +1,19 @@
+---
+- name: Configure Hub Site
+  hosts: hub_routers
+  gather_facts: no
+  connection: network_cli
+
+  tasks:
+    - include_role:
+        name: network_dmvpn
+
+
+- name: Configure Hub Site
+  hosts: spoke_routers
+  gather_facts: no
+  connection: network_cli
+
+  tasks:
+    - include_role:
+        name: network_dmvpn

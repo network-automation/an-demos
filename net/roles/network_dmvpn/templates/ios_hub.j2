@@ -1,0 +1,40 @@
+!
+crypto isakmp policy 10
+ encr aes 256
+ hash sha256
+ authentication pre-share
+ group 2
+crypto isakmp key {{ crypto_key }} address 0.0.0.0
+!
+!
+crypto ipsec transform-set {{ transform_set }} esp-aes 256 esp-sha256-hmac
+ mode transport
+!
+!
+crypto ipsec profile {{ ipsec_profile }}
+ set transform-set {{ transform_set }}
+!
+router ospf 1
+ network {{ loopback_ip | ipaddr('address') }} {{ loopback_ip | ipaddr('hostmask') }} area 0
+ network {{ tunnel_cidr.split('/')[0]}} {{tunnel_cidr | ipaddr('hostmask')}} area 0
+!
+interface Loopback0
+ ip address {{ loopback_ip | ipaddr('address') }} {{ loopback_ip | ipaddr('netmask') }}
+!
+interface Tunnel0
+ ip address {{ tunnel_ip | ipaddr('address') }} {{ tunnel_cidr | ipaddr('netmask') }}
+ no ip redirects
+ ip mtu 1400
+ ip ospf network broadcast
+ ip ospf hello-interval 30
+ ip ospf priority 255
+ ip nhrp authentication {{ transform_set }}
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 1
+ ip nhrp redirect
+ ip tcp adjust-mss 1360
+ tunnel source GigabitEthernet1
+ tunnel mode gre multipoint
+ tunnel key 0
+ tunnel protection ipsec profile {{ ipsec_profile }}
+end
