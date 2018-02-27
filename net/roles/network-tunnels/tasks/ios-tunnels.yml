@@ -1,5 +1,0 @@
----
-- include_tasks: "ios-tunnel.yml"
-  with_items: "{{ network_tunnel_list }}"
-  loop_control:
-    loop_var: network_tunnel_item

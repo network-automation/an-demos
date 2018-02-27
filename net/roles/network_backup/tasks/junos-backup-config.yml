@@ -1,0 +1,10 @@
+---
+- name: Backup the config
+  junos_config:
+    backup: yes
+    confirm_commit: yes
+  register: config_output
+  changed_when: false
+
+- set_fact:
+    temp_backup_file: "{{ config_output.backup_path }}"

@@ -1,5 +1,0 @@
-- hosts: switches
-  gather_facts: no
-  connection: network_cli
-  roles:
-    - network-vlans

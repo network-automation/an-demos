@@ -1,8 +1,24 @@
 ---
 - hosts: network
-  connection: network_cli
   gather_facts: no
-
   tasks:
-    - include_role:
-        name: network-interfaces
+
+    - name: Enable the interfaces
+      net_interface:
+        name: "{{ item.name }}"
+        enabled: True
+      when: item.ip | ipaddr
+      with_items: "{{ interfaces }}"
+
+    # - name: Add interfaces to the VRF
+    #   net_vrf:
+    #     name: "{{ item.name }}"
+    #     interfaces: "{{ item.interfaces }}"
+    #   with_items: "{{ vrf_list | default([]) }}"
+
+    - name: Set Interface IP
+      net_l3_interface:
+        name: "{{ item.name }}"
+        ipv4: "{{ item.ip }}"
+      when: item.ip | ipaddr
+      with_items: "{{ interfaces }}"

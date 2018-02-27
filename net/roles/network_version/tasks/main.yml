@@ -1,0 +1,8 @@
+---
+- include_tasks: "{{ ansible_network_os }}-facts.yml"
+
+- debug: msg="{{ inventory_hostname }}({{ ansible_network_os }}) is running {{ ansible_net_version }}"
+
+- debug: msg="{{ ansible_net_version }} < {{ minimum_version_list[ansible_network_os] }}"
+  when: minimum_version_list[ansible_network_os] is defined
+  failed_when: ansible_net_version is version_compare(minimum_version_list[ansible_network_os], '<')

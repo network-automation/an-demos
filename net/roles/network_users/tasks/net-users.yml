@@ -1,0 +1,5 @@
+---
+- name: Add users
+  net_user:
+    role: network-admin
+    aggregate: "{{ network_user_list | default([]) }}"

@@ -1,0 +1,6 @@
+---
+- name: Configure DNS resolver information
+  net_system:
+    domain_search: "{{ network_domain_search | default(omit) }}"
+    lookup_source: "{{ network_lookup_source | default(omit) }}"
+    name_servers: "{{ network_name_servers | default(omit) }}"

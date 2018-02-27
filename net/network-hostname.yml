@@ -1,0 +1,10 @@
+---
+- hosts: network
+  gather_facts: no
+  vars:
+    site_domain_name: 'example.net'
+
+  tasks:
+    - net_system:
+        hostname: "{{ inventory_hostname }}"
+        domain_name: "{{ site_domain_name }}"

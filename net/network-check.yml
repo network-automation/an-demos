@@ -1,0 +1,8 @@
+---
+- name: Make sure that we can ping the hosts from the routers
+  hosts: routers
+  gather_facts: no
+  tasks:
+    - net_ping:
+        dest: "{{ hostvars[item].ansible_host }}"
+      with_items: "{{ groups.hosts | default([]) }}"

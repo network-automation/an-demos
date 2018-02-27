@@ -1,5 +1,0 @@
----
-- set_fact:
-    find_prefix_prefix: "{{ find_prefix_cidr | ipaddr('prefix') }}"
-
-- include_tasks: "{{ ansible_network_os }}-prefix-list-facts.yml"

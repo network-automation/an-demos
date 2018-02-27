@@ -1,0 +1,4 @@
+---
+- name: Gather facts
+  ios_facts:
+    gather_subset: hardware

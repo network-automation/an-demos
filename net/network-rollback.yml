@@ -4,4 +4,4 @@
 
   tasks:
     - include_role:
-        name: network_backup
+        name: network_rollback

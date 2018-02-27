@@ -1,0 +1,13 @@
+---
+- include_vars:
+    file: "{{inventory_hostname}}.yml"
+
+- name: load hub configuration
+  ios_config:
+    src: ios_hub.j2
+  when: '"hub" in inventory_hostname'
+
+- name: load spoke Configuration
+  ios_config:
+    src: ios_spoke.j2
+  when: '"site" in inventory_hostname'

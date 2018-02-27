@@ -4,7 +4,7 @@
   gather_facts: no
 
   tasks:
-    - name: Add users
-      net_user:
-        aggregate: "{{ user_list }}"
-      when: user_list is defined
+    - include_role:
+        name: network_users
+      vars:
+        - network_user_list: "{{ network_users }}"

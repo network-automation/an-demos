@@ -1,8 +1,0 @@
----
-- name: Get facts
-  junos_facts:
-    gather_subset: all
-  register: facts_results
-  connection: netconf
-
-- debug: var=facts_results

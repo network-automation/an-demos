@@ -1,0 +1,10 @@
+---
+- name: Add BGP Networks
+  ios_config:
+    lines:
+      - address-family ipv4
+      - "network {{ network_item | ipaddr('network') }} mask {{ network_item | ipaddr('netmask') }}"
+    parents: "router bgp {{ bgp_asn }}"
+  with_items: "{{ bgp_network_list }}"
+  loop_control:
+        loop_var: network_item

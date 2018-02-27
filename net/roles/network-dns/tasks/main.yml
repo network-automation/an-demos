@@ -1,5 +1,0 @@
----
-- set_fact:
-    system_hostname: "{{ inventory_hostname.split('.')[0] }}"
-
-- include_tasks: "{{ ansible_network_os }}-dns.yml"

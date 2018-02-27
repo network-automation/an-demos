@@ -1,4 +1,0 @@
----
-- ios_config:
-    src: ios-ipsec-vpn.j2
-  when: ansible_network_os == 'ios'

@@ -1,7 +1,0 @@
----
-- hosts: network
-  connection: local
-  gather_facts: no
-  roles:
-    - network-dns
-    - network-banner

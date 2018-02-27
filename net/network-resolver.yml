@@ -1,0 +1,15 @@
+---
+- hosts: network
+  gather_facts: no
+  vars:
+    network_name_servers:
+      - 8.8.8.8
+      - 8.8.4.4
+    network_domain_search:
+      - example.net
+
+  tasks:
+    - name: Configure DNS resolver information
+      net_system:
+        domain_search: "{{ network_domain_search | default(omit) }}"
+        name_servers: "{{ network_name_servers | default(omit) }}"

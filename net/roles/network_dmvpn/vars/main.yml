@@ -1,0 +1,9 @@
+---
+# vars file for network_dmvpn
+tunnel_cidr: 192.168.1.0/24
+tunnel_hub: rtr1.hub
+crypto_key: ISA-KEY
+transform_set: DMVPN
+ipsec_profile: ipsec_prof
+tunnel_ip: "{{ tunnel_cidr | ipaddr(-2) }}"
+site_number: "{{inventory_hostname.split('.')[1] | regex_search('\\d')}}"

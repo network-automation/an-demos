@@ -1,0 +1,22 @@
+---
+- set_fact:
+    net_backup_dir: "{{ playbook_dir }}/backups"
+  when: net_backup_dir is not defined
+
+- set_fact:
+    net_backup_file: "{{ net_backup_dir }}/{{ inventory_hostname }}.cfg"
+
+- include_tasks: "{{ ansible_network_os }}-backup-config.yml"
+
+- name: Copy the temp to the destination
+  copy:
+    src: "{{ temp_backup_file }}"
+    dest: "{{ net_backup_file }}"
+    backup: yes
+    force: yes
+
+- name: Delete the temp file
+  file:
+    path: "{{ temp_backup_file }}"
+    state: absent
+  changed_when: False
