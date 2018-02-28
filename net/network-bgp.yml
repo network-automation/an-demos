@@ -1,0 +1,21 @@
+---
+- name: Setup BGP on the Hub
+  hosts: hub_routers
+  gather_facts: no
+  tasks:
+    - include_role:
+        name: network_bgp
+      vars:
+        bgp_router_id: "{{ tunnel_network | ipaddr(1) | ipaddr('address') }}"
+        bgp_asn: "{{ tunnel_asn }}"
+      with_items: "{{ groups.spoke_routers | default([]) }}"
+
+- name: Setup BGP on the Spoke
+  hosts: spoke_routers
+  gather_facts: no
+  tasks:
+    - include_role:
+        name: network_bgp
+      vars:
+        bgp_router_id: "{{ tunnel_ip | ipaddr('address') }}"
+        bgp_asn: "{{ tunnel_asn + site_number|int }}"
