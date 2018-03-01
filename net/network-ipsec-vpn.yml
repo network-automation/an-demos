@@ -1,0 +1,46 @@
+- hosts: spoke_routers
+  connection: network_cli
+  gather_facts: no
+  tasks:
+    - set_fact:
+        hub_router: "{{ groups.hub_routers[0] }}"
+
+    - include_role:
+        name: network_ipsec_vpn
+      vars:
+        vpn_tunnel_ip: "{{ tunnel_ip }}"
+        vpn_tunnel_num: "{{ site_number }}"
+        vpn_tunnel_src: "{{ interfaces.0.name }}"
+        vpn_tunnel_dst: "{{ hostvars[hub_router].ansible_host }}"
+        vpn_preshared_key: "{{ tunnel_key }}"
+
+    # - name: Setup BGP on the Spoke
+    #   ios_config:
+    #     lines:
+    #       - "neighbor {{ tunnel_network | ipaddr(1) | ipaddr('address') }} remote-as {{ tunnel_asn }}"
+    #       - "network {{ interfaces.2.ip | ipaddr('network') }}"
+    #       - address-family ipv4
+    #       - redistribute connected
+    #     parents: "router bgp {{ tunnel_asn + site_number|int }}"
+
+- hosts: hub_routers
+  connection: network_cli
+  gather_facts: no
+  tasks:
+
+    - include_role:
+        name: network_ipsec_vpn
+      vars:
+        vpn_tunnel_ip: "{{ hostvars[item].tunnel_network | ipaddr(1) }}"
+        vpn_tunnel_num: "{{ hostvars[item].site_number }}"
+        vpn_tunnel_src: "{{ interfaces.0.name }}"
+        vpn_tunnel_dst: "{{ hostvars[item].interfaces.0.public_ip_address }}"
+        vpn_preshared_key: "{{ tunnel_key }}"
+      with_items: "{{ groups.spoke_routers | default([]) }}"
+
+    # - name: Setup BGP on the Hub
+    #   ios_config:
+    #     lines:
+    #       - "neighbor {{ hostvars[item].tunnel_ip | ipaddr('address') }} remote-as {{ tunnel_asn + hostvars[item].site_number|int }}"
+    #     parents: "router bgp {{ tunnel_asn }}"
+    #   with_items: "{{ groups.spoke_routers | default([]) }}"

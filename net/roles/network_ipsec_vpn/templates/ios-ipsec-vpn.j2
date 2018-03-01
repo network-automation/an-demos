@@ -1,0 +1,17 @@
+crypto isakmp policy 1
+ encr aes
+ hash sha256
+ authentication pre-share
+ group 14
+crypto isakmp key {{ vpn_preshared_key }} address 0.0.0.0
+crypto ipsec transform-set T1 esp-3des esp-md5-hmac
+ mode transport
+crypto ipsec profile P1
+ set transform-set T1
+interface Tunnel {{ vpn_tunnel_num }}
+ ip address {{ vpn_tunnel_ip | ipaddr('address') }} {{ vpn_tunnel_ip | ipaddr('netmask') }}
+ tunnel source {{ vpn_tunnel_src }}
+ tunnel mode ipsec ipv4
+ tunnel destination {{ vpn_tunnel_dst }}
+ tunnel protection ipsec profile P1
+end
