@@ -1,0 +1,11 @@
+---
+- hosts: all
+  gather_facts: no
+  vars:
+    network_command: show version
+  tasks:
+    - ios_command:
+        commands: "{{ network_command.split(';') }}"
+      register: results
+
+    - debug: var=results.stdout_lines
