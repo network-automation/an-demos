@@ -4,9 +4,9 @@
   gather_facts: no
   vars:
     minimum_version_list:
-      ios: 16.06.01
-      junos: 17.2R1.13
+      ios: "{{ os_version | default('16.06.01')}}"
+      junos: "{{ os_version | default('17.2R1.13')}}"
 
   tasks:
-    - include_role:
-        name: network_version
+     - include_role:
+         name: network_version
