@@ -1,6 +1,6 @@
 ---
 - name: Show F5 facts
-  hosts: f5:&tmos
+  hosts: tmos
   connection: local
   gather_facts: False
 

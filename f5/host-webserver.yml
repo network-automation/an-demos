@@ -1,6 +1,6 @@
 ---
 - name: Configure the F5s hosts
-  hosts: f5:&hosts
+  hosts: app_hosts
   become: True
   gather_facts: False
 
