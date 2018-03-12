@@ -1,0 +1,16 @@
+---
+- name: Configure the F5s hosts
+  hosts: app_hosts
+  become: True
+  gather_facts: False
+
+  tasks:
+    - name: Ensure state of httpd
+      yum:
+        name: httpd
+        state: present
+
+    - name: Ensure state of service
+      service:
+        name: httpd
+        state: started
