@@ -26,8 +26,8 @@
         validate_certs: no
         state: "present"
         partition: "{{ pool_partition }}"
-        host: "{{ hostvars[item].ansible_host }}"
-        name: "{{ hostvars[item].ansible_host }}"
+        host: "{{ hostvars[item].private_ip_address }}"
+        name: "{{ item }}"
       when: groups.app_hosts is defined
       with_items: "{{ groups.app_hosts }}"
 
@@ -39,7 +39,7 @@
         validate_certs: no
         pool: "{{ pool_name }}"
         partition: "{{ pool_partition }}"
-        host: "{{ hostvars[item].ansible_host }}"
+        host: "{{ item }}"
         port: 80
         description: "web server"
         connection_limit: 100
